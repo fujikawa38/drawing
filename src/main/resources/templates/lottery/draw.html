@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title th:text="${lottery.title}">くじ</title>
+</head>
+<body>
+	<h1 ht:text="${lottery.title}">くじタイトル</h1>
+	<p th:text="${lottery.description}">説明</p>
+	<form th:action="@{/lotteries/{id}/draw(id=${lottery.id})}" method="post">
+		<button type="submit">くじを引く</button>
+	</form>
+	<div th:if="${result != null}">
+		<h2>結果</h2>
+		<p th:text="${result.name}">結果</p>
+	</div>
+</body>
+</html>
