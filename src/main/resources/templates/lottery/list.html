@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>くじ一覧</title>
+</head>
+<body>
+	<h1>くじ一覧</h1>
+	<ul>
+		<li th:each="lottery : ${lotteries}">
+			<a th:href="@{/lotteries/{id}(id=${lottery.id})}" th:text="${lottery.title}">
+				くじ名
+			</a>
+		</li>
+	</ul>
+	
+	<div th:if="${#lists.isEmpty(lotteries)}">
+		<p>くじがまだ作成されていません</p>
+	</div>
+
+</body>
+</html>

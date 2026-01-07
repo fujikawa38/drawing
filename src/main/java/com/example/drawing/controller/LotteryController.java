@@ -1,5 +1,7 @@
 package com.example.drawing.controller;
 
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.drawing.entity.Lottery;
 import com.example.drawing.entity.LotteryItem;
+import com.example.drawing.entity.User;
 import com.example.drawing.repository.LotteryRepository;
 import com.example.drawing.service.LotteryService;
 
@@ -40,6 +43,17 @@ public class LotteryController {
 		model.addAttribute("result", result);
 
 		return "lottery/draw";
+	}
+
+	@GetMapping
+	public String list(Model model) {
+		User user = new User();
+		user.setId(1L);
+
+		List<Lottery> lotteries = lotteryRepository.findByUser(user);
+
+		model.addAttribute("lotteries", lotteries);
+		return "lottery/list";
 	}
 
 }
