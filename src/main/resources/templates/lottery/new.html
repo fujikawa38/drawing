@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>くじ作成</title>
+</head>
+<body>
+	<h1>くじ作成</h1>
+	<form th:action="@{/lotteries}" th:object="${lottery}" method="post">
+		<div>
+			<label>くじ名</label><br>
+			<input type="text" th:field="*{title}" required>
+		</div>
+		
+		<div>
+			<label>除外設定</label><br>
+			<select th:field="*{excludeType}">
+				<option th:each="type : ${excludeTypes}" th:value="${type}" th:text="${type}"></option>
+			</select>
+		</div>
+		
+		<div>
+			<label>除外設定</label><br>
+			<input type="number" th:field="*{excludeCount}">
+		</div>
+		
+		<div>
+			<label>除外日数</label>
+			<input type="number" th:field="*{excludeDays}">
+		</div>
+		
+		<button type="submit">作成</button>
+	</form>
+	
+	<p>
+		<a th:href="@{/lotteries}">一覧に戻る</a>
+	</p>
+
+</body>
+</html>

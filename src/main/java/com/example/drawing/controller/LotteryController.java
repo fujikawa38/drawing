@@ -5,10 +5,12 @@ import java.util.List;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.example.drawing.entity.ExcludeType;
 import com.example.drawing.entity.Lottery;
 import com.example.drawing.entity.LotteryItem;
 import com.example.drawing.entity.User;
@@ -54,6 +56,23 @@ public class LotteryController {
 
 		model.addAttribute("lotteries", lotteries);
 		return "lottery/list";
+	}
+
+	@GetMapping("/new")
+	public String newLottery(Model model) {
+		model.addAttribute("lottery", new Lottery());
+		model.addAttribute("excludeTypes", ExcludeType.values());
+
+		return "lottery/new";
+	}
+
+	@PostMapping
+	public String create(@ModelAttribute Lottery lottery) {
+		User user = new User();
+		user.setId(1L);
+		lottery.setUser(user);
+		lotteryRepository.save(lottery);
+		return "redirect:/lotteries";
 	}
 
 }
