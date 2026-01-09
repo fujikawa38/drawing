@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>くじの中身</title>
+</head>
+<body>
+	<h1 th:text="${lottery.title} + 'の中身'">中身一覧</h1>
+	
+	<ul>
+		<li th:each="item : ${items}">
+			<span th:text="${item.name}">項目</span>
+		</li>
+	</ul>
+	
+	<div th:if="${#lists.isEmpty(items)}">
+		<p>中身がありません</p>
+	</div>
+	
+	<p>
+		<a th:href="@{/lotteries/{id}/items/new(id=${lottery.id})}">中身を追加</a>
+	</p>
+	
+	<p>
+		<a th:href="@{/lotteries/{id}(id=${lottery.id})}">くじを引く</a>
+	</p>
+
+</body>
+</html>

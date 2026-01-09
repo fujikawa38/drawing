@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>中身追加</title>
+</head>
+<body>
+	<h1 th:text="${lottery.title} + に中身を追加">中身追加</h1>
+	
+	<form th:action="@{/lotteries/{id}/items(id=${lottery.id})}" th:object="${item}" method="post">
+		<div>
+			<label>項目名</label><br>
+			<input type="text" th:field="*{name}" required>
+		</div>
+		
+		<button type="submit">追加</button>
+	</form>
+	
+	<p>
+		<a th:href="@{/lotteries/{id}/items(id=${lottery.id})}">一覧に戻る</a>
+	</p>
+
+</body>
+</html>
