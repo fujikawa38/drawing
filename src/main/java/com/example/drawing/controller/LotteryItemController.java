@@ -60,4 +60,33 @@ public class LotteryItemController {
 		return "redirect:/lotteries/" + lotteryId + "/items";
 	}
 
+	@GetMapping("/{itemId}/edit")
+	public String edit(@PathVariable Long lotteryId, @PathVariable Long itemId, Model model) {
+		LotteryItem item = itemRepository.findById(itemId).orElseThrow();
+
+		model.addAttribute("item", item);
+		model.addAttribute("lotteryId", lotteryId);
+
+		return "item/edit";
+	}
+
+	@PostMapping("/{itemId}")
+	public String update(@PathVariable Long lotteryId, @PathVariable Long itemId, @ModelAttribute LotteryItem form) {
+		LotteryItem item = itemRepository.findById(itemId).orElseThrow();
+
+		item.setName(form.getName());
+		item.setEnabled(form.isEnabled());
+
+		itemRepository.save(item);
+
+		return "redirect:/lotteries/" + lotteryId + "/items";
+	}
+
+	@PostMapping("/{itemId}/delete")
+	public String delete(@PathVariable Long lotteryId, @PathVariable Long itemId) {
+		itemRepository.deleteById(itemId);
+
+		return "redirect:/lotteries/" + lotteryId + "/items";
+	}
+
 }

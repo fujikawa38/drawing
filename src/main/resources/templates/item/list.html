@@ -10,6 +10,12 @@
 	<ul>
 		<li th:each="item : ${items}">
 			<span th:text="${item.name}">項目</span>
+			
+			<a th:href="@{/lotteries/{lotteryId}/items/{itemId}/edit(lotteryId=${lottery.id}, itemId=${item.id})}">編集</a>
+			
+			<form th:action="@{/lotteries/{lotteryId}/items/{itemId}/delete(lotteryId=${lottery.id}, itemId=${item.id})}" method="post" style="display:inline">
+				<button type="submit" onclick="return confirm('削除しますか？')">削除</button>
+			</form>
 		</li>
 	</ul>
 	

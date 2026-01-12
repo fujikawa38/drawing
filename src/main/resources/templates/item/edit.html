@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>中身編集</title>
+</head>
+<body>
+	<h1>中身編集</h1>
+	
+	<form th:action="@{/lotteries/{lotteryId}/items/{itemId}(lotteryId=${lotteryId}, itemId=${item.id})}" th:object="${item}" method="post">
+		<div>
+			<label>項目名</label><br>
+			<input type="text" th:field="*{name}" required>
+		</div>
+		
+		<div>
+			<label>
+				<input type="checkbox" th:field="*{enabled}">有効
+			</label>
+		</div>
+		
+		<button type="submit">更新</button>
+	</form>
+	
+	<p>
+		<a th:href="@{/lotteries/{id}/items(id=${lotteryId})}">
+			一覧に戻る
+		</a>
+	</p>
+
+</body>
+</html>
