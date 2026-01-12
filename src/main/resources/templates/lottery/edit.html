@@ -2,11 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 	<meta charset="UTF-8">
-	<title>くじ作成</title>
+	<title>くじ編集</title>
 </head>
 <body>
-	<h1>くじ作成</h1>
-	<form th:action="@{/lotteries}" th:object="${lottery}" method="post">
+	<h1>くじ編集</h1>
+	
+	<form th:action="@{/lotteries/{id}(id=${lottery.id})}" th:object="${lottery}" method="post">
 		<div>
 			<label>くじ名</label><br>
 			<input type="text" th:field="*{title}" required>
@@ -27,16 +28,18 @@
 		</div>
 		
 		<div>
-			<label>除外日数</label>
+			<label>除外日数</label><br>
 			<input type="number" th:field="*{excludeDays}">
 		</div>
 		
-		<button type="submit">作成</button>
+		<button type="submit">更新</button>
 	</form>
 	
-	<p>
-		<a th:href="@{/lotteries}">一覧に戻る</a>
-	</p>
+	<form th:action="@{/lotteries/{id}/delete(id=${lottery.id})}" method="post">
+		<button type="submit" onclick="return confirm('削除しますか？')">削除</button>
+	</form>
+	
+	<p><a href="/lotteries">一覧に戻る</a></p>
 
 </body>
 </html>

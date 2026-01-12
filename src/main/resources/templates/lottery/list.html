@@ -8,10 +8,24 @@
 	<h1>くじ一覧</h1>
 	<ul>
 		<li th:each="lottery : ${lotteries}">
-			<a th:href="@{/lotteries/{id}(id=${lottery.id})}" th:text="${lottery.title}">
-				くじ名
+			<span th:text="${lottery.title}">くじ名</span>
+			
+			<a th:href="@{/lotteries/{id}(id=${lottery.id})}">
+				引く
+			</a>
+			
+			<a th:href="@{/lotteries/{id}/items(id=${lottery.id})}">
+				中身
+			</a>
+			
+			<a th:href="@{/lotteries/{id}/edit(id=${lottery.id})}">
+				編集
 			</a>
 		</li>
+		
+		<p>
+			<a href="/lotteries/new">くじを作成</a>
+		</p>
 	</ul>
 	
 	<div th:if="${#lists.isEmpty(lotteries)}">
