@@ -2,7 +2,6 @@ package com.example.drawing.controller;
 
 import java.util.List;
 
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +16,7 @@ import com.example.drawing.entity.LotteryItem;
 import com.example.drawing.repository.LotteryItemRepository;
 import com.example.drawing.repository.LotteryRepository;
 import com.example.drawing.security.LoginUser;
+import com.example.drawing.service.LotteryAccessService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,14 +27,12 @@ public class LotteryItemController {
 
 	private final LotteryRepository lotteryRepository;
 	private final LotteryItemRepository itemRepository;
+	private final LotteryAccessService lotteryAccessService;
 
 	@GetMapping
 	public String list(@PathVariable Long lotteryId, @AuthenticationPrincipal LoginUser loginUser, Model model) {
-		Lottery lottery = lotteryRepository.findById(lotteryId).orElseThrow();
+		Lottery lottery = lotteryAccessService.getLotteryForUser(lotteryId, loginUser.getUser());
 
-		if (!lottery.getUser().getId().equals(loginUser.getUser().getId())) {
-			throw new AccessDeniedException("アクセス権がありません");
-		}
 		List<LotteryItem> items = itemRepository.findByLotteryAndEnabledTrue(lottery);
 
 		model.addAttribute("lottery", lottery);
@@ -45,11 +43,7 @@ public class LotteryItemController {
 
 	@GetMapping("/new")
 	public String newItem(@PathVariable Long lotteryId, @AuthenticationPrincipal LoginUser loginUser, Model model) {
-		Lottery lottery = lotteryRepository.findById(lotteryId).orElseThrow();
-
-		if (!lottery.getUser().getId().equals(loginUser.getUser().getId())) {
-			throw new AccessDeniedException("アクセス権がありません");
-		}
+		Lottery lottery = lotteryAccessService.getLotteryForUser(lotteryId, loginUser.getUser());
 
 		LotteryItem item = new LotteryItem();
 		item.setLottery(lottery);
@@ -63,11 +57,7 @@ public class LotteryItemController {
 	@PostMapping
 	public String create(@PathVariable Long lotteryId, @AuthenticationPrincipal LoginUser loginUser,
 			@ModelAttribute LotteryItem item) {
-		Lottery lottery = lotteryRepository.findById(lotteryId).orElseThrow();
-
-		if (!lottery.getUser().getId().equals(loginUser.getUser().getId())) {
-			throw new AccessDeniedException("アクセス権がありません");
-		}
+		Lottery lottery = lotteryAccessService.getLotteryForUser(lotteryId, loginUser.getUser());
 
 		item.setLottery(lottery);
 		itemRepository.save(item);
@@ -78,17 +68,9 @@ public class LotteryItemController {
 	@GetMapping("/{itemId}/edit")
 	public String edit(@PathVariable Long lotteryId, @PathVariable Long itemId,
 			@AuthenticationPrincipal LoginUser loginUser, Model model) {
-		Lottery lottery = lotteryRepository.findById(lotteryId).orElseThrow();
+		Lottery lottery = lotteryAccessService.getLotteryForUser(lotteryId, loginUser.getUser());
 
-		if (!lottery.getUser().getId().equals(loginUser.getUser().getId())) {
-			throw new AccessDeniedException("アクセス権がありません");
-		}
-
-		LotteryItem item = itemRepository.findById(itemId).orElseThrow();
-
-		if (!item.getLottery().getId().equals(lotteryId)) {
-			throw new IllegalArgumentException("不正なアクセス");
-		}
+		LotteryItem item = lotteryAccessService.getItemForLottery(itemId, lottery);
 
 		model.addAttribute("item", item);
 		model.addAttribute("lotteryId", lotteryId);
@@ -99,17 +81,9 @@ public class LotteryItemController {
 	@PostMapping("/{itemId}")
 	public String update(@PathVariable Long lotteryId, @PathVariable Long itemId,
 			@AuthenticationPrincipal LoginUser loginUser, @ModelAttribute LotteryItem form) {
-		Lottery lottery = lotteryRepository.findById(lotteryId).orElseThrow();
+		Lottery lottery = lotteryAccessService.getLotteryForUser(lotteryId, loginUser.getUser());
 
-		if (!lottery.getUser().getId().equals(loginUser.getUser().getId())) {
-			throw new AccessDeniedException("アクセス権がありません");
-		}
-
-		LotteryItem item = itemRepository.findById(itemId).orElseThrow();
-
-		if (!item.getLottery().getId().equals(lotteryId)) {
-			throw new IllegalArgumentException("不正アクセス");
-		}
+		LotteryItem item = lotteryAccessService.getItemForLottery(itemId, lottery);
 
 		item.setName(form.getName());
 		item.setEnabled(form.isEnabled());
@@ -122,19 +96,11 @@ public class LotteryItemController {
 	@PostMapping("/{itemId}/delete")
 	public String delete(@PathVariable Long lotteryId, @PathVariable Long itemId,
 			@AuthenticationPrincipal LoginUser loginUser) {
-		Lottery lottery = lotteryRepository.findById(lotteryId).orElseThrow();
+		Lottery lottery = lotteryAccessService.getLotteryForUser(lotteryId, loginUser.getUser());
 
-		if (!lottery.getUser().getId().equals(loginUser.getUser().getId())) {
-			throw new AccessDeniedException("アクセス権がありません");
-		}
+		LotteryItem item = lotteryAccessService.getItemForLottery(itemId, lottery);
 
-		LotteryItem item = itemRepository.findById(itemId).orElseThrow();
-
-		if (!item.getLottery().getId().equals(lotteryId)) {
-			throw new IllegalArgumentException("不正なアクセス");
-		}
-
-		itemRepository.deleteById(itemId);
+		itemRepository.delete(item);
 
 		return "redirect:/lotteries/" + lotteryId + "/items";
 	}

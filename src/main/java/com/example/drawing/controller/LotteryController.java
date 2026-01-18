@@ -2,7 +2,6 @@ package com.example.drawing.controller;
 
 import java.util.List;
 
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +17,7 @@ import com.example.drawing.entity.LotteryItem;
 import com.example.drawing.entity.User;
 import com.example.drawing.repository.LotteryRepository;
 import com.example.drawing.security.LoginUser;
+import com.example.drawing.service.LotteryAccessService;
 import com.example.drawing.service.LotteryService;
 
 import lombok.RequiredArgsConstructor;
@@ -29,14 +29,11 @@ public class LotteryController {
 
 	private final LotteryRepository lotteryRepository;
 	private final LotteryService lotteryService;
+	private final LotteryAccessService lotteryAccessService;
 
 	@GetMapping("/{id}")
 	public String showLottery(@PathVariable Long id, @AuthenticationPrincipal LoginUser loginUser, Model model) {
-		Lottery lottery = lotteryRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("くじが存在しません"));
-
-		if (!lottery.getUser().getId().equals(loginUser.getUser().getId())) {
-			throw new AccessDeniedException("アクセス権がありません");
-		}
+		Lottery lottery = lotteryAccessService.getLotteryForUser(id, loginUser.getUser());
 
 		model.addAttribute("lottery", lottery);
 		return "lottery/draw";
@@ -44,11 +41,7 @@ public class LotteryController {
 
 	@PostMapping("/{id}/draw")
 	public String draw(@PathVariable Long id, @AuthenticationPrincipal LoginUser loginUser, Model model) {
-		Lottery lottery = lotteryRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("くじが存在しません"));
-
-		if (!lottery.getUser().getId().equals(loginUser.getUser().getId())) {
-			throw new AccessDeniedException("アクセス権がありません");
-		}
+		Lottery lottery = lotteryAccessService.getLotteryForUser(id, loginUser.getUser());
 
 		LotteryItem result = lotteryService.draw(lottery);
 
@@ -68,7 +61,7 @@ public class LotteryController {
 	}
 
 	@GetMapping("/new")
-	public String newLottery(Model model) {
+	public String newLottery(@AuthenticationPrincipal LoginUser loginUser, Model model) {
 		model.addAttribute("lottery", new Lottery());
 		model.addAttribute("excludeTypes", ExcludeType.values());
 
@@ -84,11 +77,7 @@ public class LotteryController {
 
 	@GetMapping("/{id}/edit")
 	public String edit(@PathVariable Long id, @AuthenticationPrincipal LoginUser loginUser, Model model) {
-		Lottery lottery = lotteryRepository.findById(id).orElseThrow();
-
-		if (!lottery.getUser().getId().equals(loginUser.getUser().getId())) {
-			throw new AccessDeniedException("アクセス権がありません");
-		}
+		Lottery lottery = lotteryAccessService.getLotteryForUser(id, loginUser.getUser());
 
 		model.addAttribute("lottery", lottery);
 		return "lottery/edit";
@@ -97,11 +86,7 @@ public class LotteryController {
 	@PostMapping("/{id}")
 	public String update(@PathVariable Long id, @AuthenticationPrincipal LoginUser loginUser,
 			@ModelAttribute Lottery form) {
-		Lottery lottery = lotteryRepository.findById(id).orElseThrow();
-
-		if (!lottery.getUser().getId().equals(loginUser.getUser().getId())) {
-			throw new AccessDeniedException("アクセス権がありません");
-		}
+		Lottery lottery = lotteryAccessService.getLotteryForUser(id, loginUser.getUser());
 
 		lottery.setTitle(form.getTitle());
 		lottery.setExcludeType(form.getExcludeType());
@@ -114,13 +99,9 @@ public class LotteryController {
 
 	@PostMapping("/{id}/delete")
 	public String delete(@PathVariable Long id, @AuthenticationPrincipal LoginUser loginUser) {
-		Lottery lottery = lotteryRepository.findById(id).orElseThrow();
+		Lottery lottery = lotteryAccessService.getLotteryForUser(id, loginUser.getUser());
 
-		if (!lottery.getUser().getId().equals(loginUser.getUser().getId())) {
-			throw new AccessDeniedException("アクセス権がありません");
-		}
-
-		lotteryRepository.deleteById(id);
+		lotteryRepository.delete(lottery);
 		return "redirect:/lotteries";
 	}
 
