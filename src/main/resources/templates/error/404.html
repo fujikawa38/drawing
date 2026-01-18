@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>ページが見つかりません</title>
+</head>
+<body>
+	<h1>404 Not Found</h1>
+	<p th:text="${message}">指定されたページは存在しないか、すでに削除されています</p>
+	<a th:href="@{/lotteries}">くじ一覧に戻る</a>
+</body>
+</html>

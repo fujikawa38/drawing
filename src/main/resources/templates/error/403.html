@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>アクセス権限がありません</title>
+</head>
+<body>
+	<h1>403 Forbidden</h1>
+	<p th:text="${message}">アクセス権がありません</p>
+	<a th:href="@{/lotteries}">くじ一覧に戻る</a>
+</body>
+</html>
