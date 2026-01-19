@@ -2,9 +2,12 @@ package com.example.drawing.controller;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,9 +58,15 @@ public class LotteryItemController {
 	}
 
 	@PostMapping
-	public String create(@PathVariable Long lotteryId, @AuthenticationPrincipal LoginUser loginUser,
-			@ModelAttribute LotteryItem item) {
+	public String create(@PathVariable Long lotteryId, @Valid @ModelAttribute LotteryItem item, BindingResult result,
+			@AuthenticationPrincipal LoginUser loginUser, Model model) {
 		Lottery lottery = lotteryAccessService.getLotteryForUser(lotteryId, loginUser.getUser());
+
+		if (result.hasErrors()) {
+			item.setLottery(lottery);
+			model.addAttribute("lottery", lottery);
+			return "item/new";
+		}
 
 		item.setLottery(lottery);
 		itemRepository.save(item);
@@ -80,10 +89,16 @@ public class LotteryItemController {
 
 	@PostMapping("/{itemId}")
 	public String update(@PathVariable Long lotteryId, @PathVariable Long itemId,
-			@AuthenticationPrincipal LoginUser loginUser, @ModelAttribute LotteryItem form) {
+			@AuthenticationPrincipal LoginUser loginUser, @Valid @ModelAttribute("item") LotteryItem form,
+			BindingResult bindingResult, Model model) {
 		Lottery lottery = lotteryAccessService.getLotteryForUser(lotteryId, loginUser.getUser());
 
 		LotteryItem item = lotteryAccessService.getItemForLottery(itemId, lottery);
+
+		if (bindingResult.hasErrors()) {
+			model.addAttribute("lotteryId", lotteryId);
+			return "item/edit";
+		}
 
 		item.setName(form.getName());
 		item.setEnabled(form.isEnabled());

@@ -2,9 +2,12 @@ package com.example.drawing.controller;
 
 import java.util.List;
 
+import jakarta.validation.Valid;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -69,7 +72,12 @@ public class LotteryController {
 	}
 
 	@PostMapping
-	public String create(@AuthenticationPrincipal LoginUser loginUser, @ModelAttribute Lottery lottery) {
+	public String create(@AuthenticationPrincipal LoginUser loginUser, @Valid @ModelAttribute Lottery lottery,
+			BindingResult result, Model model) {
+		if (result.hasErrors()) {
+			model.addAttribute("excludeTypes", ExcludeType.values());
+			return "lottery/new";
+		}
 		lottery.setUser(loginUser.getUser());
 		lotteryRepository.save(lottery);
 		return "redirect:/lotteries";
@@ -85,7 +93,12 @@ public class LotteryController {
 
 	@PostMapping("/{id}")
 	public String update(@PathVariable Long id, @AuthenticationPrincipal LoginUser loginUser,
-			@ModelAttribute Lottery form) {
+			@Valid @ModelAttribute Lottery form, BindingResult result, Model model) {
+		if (result.hasErrors()) {
+			model.addAttribute("lottery", form);
+			model.addAttribute("excludeTypes", ExcludeType.values());
+			return "lottery/edit";
+		}
 		Lottery lottery = lotteryAccessService.getLotteryForUser(id, loginUser.getUser());
 
 		lottery.setTitle(form.getTitle());

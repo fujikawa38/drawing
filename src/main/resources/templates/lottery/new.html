@@ -8,8 +8,9 @@
 	<h1>くじ作成</h1>
 	<form th:action="@{/lotteries}" th:object="${lottery}" method="post">
 		<div>
-			<label>くじ名</label><br>
-			<input type="text" th:field="*{title}" required>
+			<label>タイトル</label><br>
+			<input type="text" th:field="*{title}">
+			<div th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
 		</div>
 		
 		<div>
@@ -19,16 +20,22 @@
 				<option value="COUNT">回数</option>
 				<option value="DATE">日数</option>
 			</select>
+			
+			<div th:if="${#fields.hasErrors('excludeType')}" th:errors="*{excludeType}"></div>
 		</div>
 		
 		<div>
 			<label>除外回数</label><br>
 			<input type="number" th:field="*{excludeCount}">
+			
+			<div th:if="${#fields.hasErrors('excludeCount')}" th:errors="*{excludeCount}"></div>
 		</div>
 		
 		<div>
 			<label>除外日数</label>
 			<input type="number" th:field="*{excludeDays}">
+			
+			<div th:if="${#fields.hasErrors('excludeDays')}" th:errors="*{excludeDays}"></div>
 		</div>
 		
 		<button type="submit">作成</button>

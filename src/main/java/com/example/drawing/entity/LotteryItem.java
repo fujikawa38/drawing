@@ -9,6 +9,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -27,6 +29,8 @@ public class LotteryItem extends BaseEntity {
 	@JoinColumn(name = "lottery_id", nullable = false)
 	private Lottery lottery;
 
+	@NotBlank(message = "項目名は必須です")
+	@Size(max = 30, message = "30文字以内で入力してください")
 	@Column(nullable = false)
 	private String name;
 
