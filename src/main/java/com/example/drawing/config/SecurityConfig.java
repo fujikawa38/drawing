@@ -8,8 +8,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
 	@Bean
@@ -17,11 +20,11 @@ public class SecurityConfig {
 
 		http
 				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/css/**", "/js/**").permitAll()
-						.requestMatchers("/login", "/register").permitAll()
+						.requestMatchers("/login", "/login/**", "/register", "/css/**", "/js/**").permitAll()
 						.anyRequest().authenticated())
 				.formLogin(form -> form
 						.loginPage("/login")
+						.loginProcessingUrl("/login")
 						.defaultSuccessUrl("/lotteries", true)
 						.permitAll())
 				.logout(logout -> logout
