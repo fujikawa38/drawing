@@ -10,7 +10,8 @@
 	<form th:action="@{/lotteries/{id}/items(id=${lottery.id})}" th:object="${item}" method="post">
 		<div>
 			<label>項目名</label><br>
-			<input type="text" th:field="*{name}" required>
+			<input type="text" th:field="*{name}">
+			<div th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
 		</div>
 		
 		<button type="submit">追加</button>

@@ -58,12 +58,12 @@ public class LotteryItemController {
 	}
 
 	@PostMapping
-	public String create(@PathVariable Long lotteryId, @Valid @ModelAttribute LotteryItem item, BindingResult result,
-			@AuthenticationPrincipal LoginUser loginUser, Model model) {
+	public String create(@PathVariable Long lotteryId, @AuthenticationPrincipal LoginUser loginUser,
+			@Valid @ModelAttribute("item") LotteryItem item, BindingResult result,
+			Model model) {
 		Lottery lottery = lotteryAccessService.getLotteryForUser(lotteryId, loginUser.getUser());
 
 		if (result.hasErrors()) {
-			item.setLottery(lottery);
 			model.addAttribute("lottery", lottery);
 			return "item/new";
 		}
