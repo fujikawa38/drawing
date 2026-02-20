@@ -26,6 +26,11 @@
 		<p>
 			<a href="/lotteries/new">くじを作成</a>
 		</p>
+		<div>
+			<form th:action="@{/logout}" method="post">
+				<button type="submit">ログアウト</button>
+			</form>
+		</div>
 	</ul>
 	
 	<div th:if="${#lists.isEmpty(lotteries)}">

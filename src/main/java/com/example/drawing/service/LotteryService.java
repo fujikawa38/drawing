@@ -33,7 +33,17 @@ public class LotteryService {
 		List<LotteryItem> availableItems = items.stream().filter(item -> isAvailable(item, lottery)).toList();
 
 		if (availableItems.isEmpty()) {
-			throw new IllegalStateException("すべての項目が抽選の対象外です");
+			List<LotteryItemState> states = stateRepository.findByLotteryItem_Lottery(lottery);
+
+			for (LotteryItemState state : states) {
+				state.resetExclude();
+			}
+
+			availableItems = items.stream().filter(item -> isAvailable(item, lottery)).toList();
+		}
+
+		if (availableItems.isEmpty()) {
+			throw new IllegalStateException("抽選可能な項目が存在しません");
 		}
 
 		LotteryItem selected = availableItems.get(new Random().nextInt(availableItems.size()));

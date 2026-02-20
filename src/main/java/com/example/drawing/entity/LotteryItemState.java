@@ -34,4 +34,9 @@ public class LotteryItemState {
 
 	@Column(name = "excluded_until")
 	private LocalDateTime excludedUntil;
+
+	public void resetExclude() {
+		this.remainingCount = 0;
+		this.excludedUntil = null;
+	}
 }
