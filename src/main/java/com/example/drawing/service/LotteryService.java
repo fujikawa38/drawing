@@ -37,6 +37,10 @@ public class LotteryService {
 		Map<Long, LotteryItemState> stateMap = states.stream()
 				.collect(Collectors.toMap(s -> s.getLotteryItem().getId(), s -> s));
 
+		for (LotteryItem item : items) {
+			stateMap.computeIfAbsent(item.getId(), id -> createState(item));
+		}
+
 		List<LotteryItem> availableItems = items.stream().filter(item -> isAvailable(item, lottery, stateMap)).toList();
 
 		if (availableItems.isEmpty()) {
@@ -59,7 +63,7 @@ public class LotteryService {
 
 	private boolean isAvailable(LotteryItem item, Lottery lottery, Map<Long, LotteryItemState> stateMap) {
 
-		LotteryItemState state = stateRepository.findByLotteryItem(item).orElseGet(() -> createState(item));
+		LotteryItemState state = stateMap.get(item.getId());
 
 		return switch (lottery.getExcludeType()) {
 		case NONE -> true;
@@ -78,7 +82,7 @@ public class LotteryService {
 			Map<Long, LotteryItemState> stateMap) {
 
 		for (LotteryItem item : allItems) {
-			LotteryItemState state = stateMap.computeIfAbsent(item.getId(), id -> createState(item));
+			LotteryItemState state = stateMap.get(item.getId());
 
 			switch (lottery.getExcludeType()) {
 			case NONE -> {
