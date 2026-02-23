@@ -3,12 +3,12 @@
 <head>
 	<meta charset="UTF-8">
 	<link rel="stylesheet" th:href="@{/css/error.css}">
-	<title>404 ページが見つかりません</title>
+	<title>500 システムエラー</title>
 </head>
 <body>
 	<div class="container">
-		<h1>404 ページが見つかりません</h1>
-		<p th:text="${message}">指定されたページは存在しないか、すでに削除されています。</p>
+		<h1>500 システムエラー</h1>
+		<p th:text="${message}">システムエラーが発生しました。時間をおいて再度お試しください。</p>
 		<a th:href="@{/lotteries}">トップへ戻る</a>
 	</div>
 </body>

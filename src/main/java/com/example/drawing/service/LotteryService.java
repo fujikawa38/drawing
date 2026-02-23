@@ -2,7 +2,9 @@ package com.example.drawing.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,12 +19,12 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class LotteryService {
 
 	private final LotteryItemRepository itemRepository;
 	private final LotteryItemStateRepository stateRepository;
 
+	@Transactional
 	public LotteryItem draw(Lottery lottery) {
 		List<LotteryItem> items = itemRepository.findByLotteryAndEnabledTrue(lottery);
 
@@ -30,16 +32,18 @@ public class LotteryService {
 			throw new IllegalStateException("抽選できる項目がありません");
 		}
 
-		List<LotteryItem> availableItems = items.stream().filter(item -> isAvailable(item, lottery)).toList();
+		List<LotteryItemState> states = stateRepository.findByLotteryItem_Lottery(lottery);
+
+		Map<Long, LotteryItemState> stateMap = states.stream()
+				.collect(Collectors.toMap(s -> s.getLotteryItem().getId(), s -> s));
+
+		List<LotteryItem> availableItems = items.stream().filter(item -> isAvailable(item, lottery, stateMap)).toList();
 
 		if (availableItems.isEmpty()) {
-			List<LotteryItemState> states = stateRepository.findByLotteryItem_Lottery(lottery);
 
-			for (LotteryItemState state : states) {
-				state.resetExclude();
-			}
+			stateMap.values().forEach(LotteryItemState::resetExclude);
 
-			availableItems = items.stream().filter(item -> isAvailable(item, lottery)).toList();
+			availableItems = items.stream().filter(item -> isAvailable(item, lottery, stateMap)).toList();
 		}
 
 		if (availableItems.isEmpty()) {
@@ -48,12 +52,12 @@ public class LotteryService {
 
 		LotteryItem selected = availableItems.get(new Random().nextInt(availableItems.size()));
 
-		updateStates(lottery, selected, items);
+		updateStates(lottery, selected, items, stateMap);
 
 		return selected;
 	}
 
-	private boolean isAvailable(LotteryItem item, Lottery lottery) {
+	private boolean isAvailable(LotteryItem item, Lottery lottery, Map<Long, LotteryItemState> stateMap) {
 
 		LotteryItemState state = stateRepository.findByLotteryItem(item).orElseGet(() -> createState(item));
 
@@ -70,10 +74,11 @@ public class LotteryService {
 		return stateRepository.save(state);
 	}
 
-	private void updateStates(Lottery lottery, LotteryItem selected, List<LotteryItem> allItems) {
+	private void updateStates(Lottery lottery, LotteryItem selected, List<LotteryItem> allItems,
+			Map<Long, LotteryItemState> stateMap) {
 
 		for (LotteryItem item : allItems) {
-			LotteryItemState state = stateRepository.findByLotteryItem(item).orElseGet(() -> createState(item));
+			LotteryItemState state = stateMap.computeIfAbsent(item.getId(), id -> createState(item));
 
 			switch (lottery.getExcludeType()) {
 			case NONE -> {

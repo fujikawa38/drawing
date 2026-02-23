@@ -3,13 +3,14 @@
 <head>
 	<meta charset="UTF-8">
 	<link rel="stylesheet" th:href="@{/css/error.css}">
-	<title>404 ページが見つかりません</title>
+	<title>400 不正なリクエスト</title>
 </head>
 <body>
 	<div class="container">
-		<h1>404 ページが見つかりません</h1>
-		<p th:text="${message}">指定されたページは存在しないか、すでに削除されています。</p>
+		<h1>400 不正なリクエスト</h1>
+		<p th:text="${message}">入力内容に誤りがあります。</p>
 		<a th:href="@{/lotteries}">トップへ戻る</a>
 	</div>
+
 </body>
 </html>
